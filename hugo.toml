@@ -1,8 +1,7 @@
-baseURL = 'https://example.org/'
+baseURL = 'https://noiseandpatterns.org/'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = 'Noise And Patterns'
 theme = 'papermod'
-
 
 
 [[menu.main]]
