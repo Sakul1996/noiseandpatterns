@@ -1,8 +1,7 @@
 baseURL = 'https://noiseandpatterns.org/'
 languageCode = 'en-us'
-title = 'Nose And Patterns'
+title = 'Noise And Patterns'
 theme = 'papermod'
-
 
 
 [[menu.main]]
