@@ -1,8 +1,8 @@
 ---
 title: "Hello — mein erster Eintrag"
-date: 2025-01-01
+date: 2025-11-26
 draft: false
-summary: "Testpost – meine Seite läuft jetzt."
+summary: "Hello World!"
 ---
   
 Dies ist mein erster Post, um sicherzustellen, dass alles funktioniert.  
