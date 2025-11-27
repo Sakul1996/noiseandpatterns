@@ -1,6 +1,6 @@
 ---
 title: "Hello — mein erster Eintrag"
-date: 2025-26-11
+date: 2025-11-26
 draft: false
 summary: "Hello World!"
 ---
