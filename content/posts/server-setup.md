@@ -34,9 +34,9 @@ Why do we need a static IP? For servers, we use a static IP because we don't wan
 To find the netplan file, you have to search for it. 
 In bash, "ls" is the command to list the contents of the directory you are in. 
 
-```
+~~~bash
 ls /etc/netplan/
-```
+~~~
 
 The "etc" part is the folder in a Linux system that contains the setup files, like the netplan config or the settings for the SSH configuration.
 In my case, there were two YAML files. "00-installer-config.yaml" and "50-cloud-init.yaml". We will work on the 50-cloud-init.yaml document. On some systems, this file is managed by cloud-init, which can overwrite manual changes. For local learning setups, this is usually not an issue.
@@ -44,7 +44,7 @@ To look at the document, we enter cat /etc/netplan/50-cloud-init.yaml (`cat` wil
 
 This is the typical structure of the YAML file:
 
-```
+~~~bash
 network:
   version: NUMBER
   renderer: STRING
@@ -59,26 +59,27 @@ network:
   vrfs: MAPPING
   wifis: MAPPING
   nm-devices: MAPPING
-```
+~~~
+
   
 Unfortunately, mistakes, such as incorrect indentation, can lead to problems; we should first make a short backup. Back in the terminal, we will enter: 
 
-```
+~~~bash
 sudo cp /etc/netplan/50-cloud-init.yaml ~/50-cloud-init.yaml.bak
+~~~
 
-```
 `cp` stands for "copy". You simply copy and save the file as a backup. 
 
 In case we make a mistake or break something, we can call this backup and undo our happy little accident.
 Now we can finally tackle the IP. For that, we open the file using the `nano` command. This allows us to edit the file we are opening.
 
-```
+~~~bash
 sudo nano /etc/netplan/50-cloud-init.yaml
-```
+~~~
 
 We want to change the DHCP. DHCP stands for Dynamic Host Configuration Protocol. This means that when you boot up the server, the router it is connected to will assign it a dynamic IP address. Once we open the YAML file, we want to disable DHCP. For this, we set "dhcp4" to "no". You will find this under the "Ethernet" section. Make your life easier by setting up the server with an Ethernet cable. Using a laptop's built-in Wi-Fi might be tempting, but it will cause issues at this point (as I painfully learned).
 
-```
+~~~bash
 network:
   version: 2
   renderer: networkd
@@ -95,22 +96,22 @@ network:
         addresses:
           - 192.168.2.135
           - 1.1.1.1
-```
+~~~
 
 If you lose connection, undo the change using the backup file.
 
 Then simply apply the changes.
 
-```
+~~~bash
 sudo netplan apply
-```
+~~~
 
 To check if the configuration of the IP address has worked, use:
 
-```
+~~~bash
 ip a
 ip route
-```
+~~~
 
 The first step of server hygiene is done. 
 
@@ -119,15 +120,15 @@ Your default user already has sudo rights. `sudo` stands for "superuser do". Thi
 Still, it is good practice to understand how administrative access works.  
 In Linux, permissions are managed through groups. Adding a user to the `sudo` group allows them to perform administrative tasks when needed.
 
-```
+~~~bash
 sudo adduser username
-```
+~~~
 
 To make this user an admin, you call the following line: 
 
-```
+~~~bash
 sudo usermod -aG sudo yourusername 
-```
+~~~
 
 
 ### Setting up SSH
@@ -137,44 +138,44 @@ Starting two SSH sessions in two separate terminals might be a good idea. If som
 Ubuntu includes OpenSSH, so getting started is quite simple. Instead of passwords, we use authentication keys. They ensure that only the server and the user can access the data exchanged between them.
 For this, you first create the keys:
 
-```
+~~~bash
 ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-```
+~~~
 
 It will now ask you which file you want to use to save the keys. You can use the directory it recommends. 
 
 Next, we have to give the server the public key. For this, run the line:
 
-```
+~~~bash
 ssh-copy-id username@your_server_ip
-```
+~~~
 
 Now we can test if the key works. 
 
-```
+~~~bash
 ssh username@your_server_ip
-```
+~~~
 
 If it works, we can disable the password login by editing the SSH configuration file...
 
-```
+~~~bash
 sudo nano /etc/ssh/sshd_config
-```
+~~~
 
 ... and changing the following options to "no":
 
-```
+~~~bash
 PasswordAuthentication no
 PermitRootLogin no
-```
+~~~
 
 Save the changes and close the file. 
 
 To finish the setup, we just have to restart the SSH service: 
 
-```
+~~~bash
 sudo systemctl restart sshd
-```
+~~~
 
 SSH key authentication worked out if you can log in without a password.
 Next, we make sure to do our housekeeping.
@@ -199,47 +200,47 @@ Next we will install Fail2Ban. Fail2Ban will help you protect your server from a
 One of the most common ways to attack a server is a brute-force attack. Here, the attacker will try to guess, for example, your password by running a script that iterates through every possible combination of characters until access to the server is gained. This is a topic of its own, but if you are interested, you can start reading into it here (https://en.wikipedia.org/wiki/Brute-force_attack)
 Setting up Fail2Ban again is quite simple. In this case, we first have to install it. For our Ubuntu server, we will run the line:
 
-```
+~~~bash
 sudo apt update
 sudo apt install fail2ban  
-```
+~~~
 
 Now we need to set up the configuration file. For this, we run:
 
-```
+~~~bash
 sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-```
+~~~
 
 In your jail.local file, you will make sure that the 'sshd' section is enabled. "Jails" are the security rules that are active. 
 In our jail.local file we will check and or change the sshd section to: 
 
-```
+~~~bash
 [sshd]
 enabled = true
 port = ssh
 logpath = /var/log/auth.log  # Adjust for your distribution
 maxretry = 5
-```
+~~~
 
 Now restart:
 
-```
+~~~bash
 sudo systemctl restart fail2ban
-```
+~~~
 
 To verify that Fail2Ban is running, we can check its status:
 
-```
+~~~bash
 sudo fail2ban-client status
-```
+~~~
 
 This will show you if Fail2Ban is active.
 
 To look at the banned IPs, you can enter:
 
-```
+~~~bash
 sudo fail2ban-client status sshd
-```
+~~~
 
 If you use a home server like me, there might be no banned IP. 
 
@@ -251,21 +252,21 @@ The firewall has the same task as security at a stadium. It checks who is going 
 Because I like it uncomplicated, I installed UFW (Uncomplicated Firewall) - but also because it is a common tool to manage your firewall. We just need to run the following commands. 
 First, we need to allow SSH traffic - otherwise, we cannot access our server via SSH
 
-```
+~~~bash
 sudo ufw allow OpenSSH
-```
+~~~
 
 Now we simply enable UFW...
 
-```
+~~~bash
 sudo ufw enable
-```
+~~~
 
 ... and check its status
 
-```
+~~~bash
 sudo ufw status
-```
+~~~
 
 You should see that SSH is allowed and all other incoming traffic is denied.
 Again, all of these code snippets are available in the Linux Server Setup – Part 1: A Beginner’s Guide article, along with additional information and resources. 
