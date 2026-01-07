@@ -43,6 +43,7 @@ In my case, there were two YAML files. "00-installer-config.yaml" and "50-cloud-
 To look at the document, we enter cat /etc/netplan/50-cloud-init.yaml (`cat` will allow you to look at the file.)
 
 This is the typical structure of the YAML file:
+
 ```
 network:
   version: NUMBER
@@ -61,8 +62,10 @@ network:
 ```
   
 Unfortunately, mistakes, such as incorrect indentation, can lead to problems; we should first make a short backup. Back in the terminal, we will enter: 
+
 ```
 sudo cp /etc/netplan/50-cloud-init.yaml ~/50-cloud-init.yaml.bak
+
 ```
 `cp` stands for "copy". You simply copy and save the file as a backup. 
 
@@ -72,7 +75,6 @@ Now we can finally tackle the IP. For that, we open the file using the `nano` co
 ```
 sudo nano /etc/netplan/50-cloud-init.yaml
 ```
-
 
 We want to change the DHCP. DHCP stands for Dynamic Host Configuration Protocol. This means that when you boot up the server, the router it is connected to will assign it a dynamic IP address. Once we open the YAML file, we want to disable DHCP. For this, we set "dhcp4" to "no". You will find this under the "Ethernet" section. Make your life easier by setting up the server with an Ethernet cable. Using a laptop's built-in Wi-Fi might be tempting, but it will cause issues at this point (as I painfully learned).
 
