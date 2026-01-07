@@ -77,7 +77,7 @@ sudo nano /etc/netplan/50-cloud-init.yaml
 We want to change the DHCP. DHCP stands for Dynamic Host Configuration Protocol. This means that when you boot up the server, the router it is connected to will assign it a dynamic IP address. Once we open the YAML file, we want to disable DHCP. For this, we set "dhcp4" to "no". You will find this under the "Ethernet" section. Make your life easier by setting up the server with an Ethernet cable. Using a laptop's built-in Wi-Fi might be tempting, but it will cause issues at this point (as I painfully learned).
 
 ```
-  network:
+network:
   version: 2
   renderer: networkd
 
@@ -94,14 +94,17 @@ We want to change the DHCP. DHCP stands for Dynamic Host Configuration Protocol.
           - 192.168.2.135
           - 1.1.1.1
 ```
+
 If you lose connection, undo the change using the backup file.
 
 Then simply apply the changes.
+
 ```
 sudo netplan apply
 ```
 
 To check if the configuration of the IP address has worked, use:
+
 ```
 ip a
 ip route
@@ -119,6 +122,7 @@ sudo adduser username
 ```
 
 To make this user an admin, you call the following line: 
+
 ```
 sudo usermod -aG sudo yourusername 
 ```
@@ -137,29 +141,35 @@ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 
 It will now ask you which file you want to use to save the keys. You can use the directory it recommends. 
 
-Next, we have to give the server the public key. For this, run the line
+Next, we have to give the server the public key. For this, run the line:
+
 ```
 ssh-copy-id username@your_server_ip
 ```
 
-Now we can test if the key works. ```
+Now we can test if the key works. 
+
 ```
 ssh username@your_server_ip
 ```
 
 If it works, we can disable the password login by editing the SSH configuration file...
+
 ```
 sudo nano /etc/ssh/sshd_config
 ```
 
 ... and changing the following options to "no":
+
 ```
 PasswordAuthentication no
 PermitRootLogin no
 ```
+
 Save the changes and close the file. 
 
 To finish the setup, we just have to restart the SSH service: 
+
 ```
 sudo systemctl restart sshd
 ```
@@ -210,6 +220,7 @@ maxretry = 5
 ```
 
 Now restart:
+
 ```
 sudo systemctl restart fail2ban
 ```
@@ -219,6 +230,7 @@ To verify that Fail2Ban is running, we can check its status:
 ```
 sudo fail2ban-client status
 ```
+
 This will show you if Fail2Ban is active.
 
 To look at the banned IPs, you can enter:
@@ -233,7 +245,7 @@ All of these steps and code are directly taken from the Fail2Ban section of the 
 
 
 #### Setting up the Firewall
- The firewall has the same task as security at a stadium. It checks who is going in or out and if they are on the guest list or banned. Keeping the stadium analogy, your server, just as the stadium has multiple entrances, so-called "ports". A firewall closes ports that are not needed, just as entrances to the stadium that are not used will be locked. 
+The firewall has the same task as security at a stadium. It checks who is going in or out and if they are on the guest list or banned. Keeping the stadium analogy, your server, just as the stadium has multiple entrances, so-called "ports". A firewall closes ports that are not needed, just as entrances to the stadium that are not used will be locked. 
 Because I like it uncomplicated, I installed UFW (Uncomplicated Firewall) - but also because it is a common tool to manage your firewall. We just need to run the following commands. 
 First, we need to allow SSH traffic - otherwise, we cannot access our server via SSH
 
@@ -301,5 +313,7 @@ Fail2Ban Project. (n.d.). _Fail2Ban documentation_.
 
 Shotts, W. (n.d.). _The Linux command line_.  
 [https://linuxcommand.org/tlcl.php]
+
+
 
 
